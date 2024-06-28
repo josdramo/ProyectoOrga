@@ -1,6 +1,35 @@
-# inicializarTablero: Inicializa el tablero con valores iniciales.
+NUM_CASILLAS:      .word 12
+NUM_CHACALES:      .word 4
+NUM_TESOROS:       .word 8
+PREMIO_TESORO:     .word 100
+TESOROS_GANAR:     .word 4
+BUFFER_SIZE:       .word 100
+
 .data
-    tablero: .space 128  # Reserva espacio para el tablero (32 elementos de 4 bytes)
+	tablero: .space 12 
+	descubiertas: .space 48
+	numDescubiertas: .word 0
+	chacalesEncontrados: .word 0
+	tesorosEncontrados: .word 0
+	dineroGanado: .word 0
+	intentosFalidos: .word 0
+	ultimosIntentos: .space 12
+	continuarJugando: .space 1
+	casilla: .word 0
+    
+	strDineroGanado:  .asciiz "Dinero ganado: $"
+	strChacalesEncontrados: .asciiz "Chacales encontrados: "
+	strNumeroCasillaGenerado: .asciiz "Número de casilla generado: "
+	strCasillaDescubierta: .asciiz "Casilla ya descubierta. Pierde un intento.\n"
+	strEncontrasteChacal: .asciiz "¡Encontraste un chacal!\n"
+	strEncontrasteTesoro: .asciiz "¡Encontraste un tesoro! Ganaste $"
+	strDeseasContinuar: .asciiz "¿Deseas continuar jugando? (1: sí, 2: no): "
+	strOpcionInvalida: .asciiz "Opción inválida. Por favor, ingresa 1 para sí o 2 para no.\n"
+	strTresCasillasRepetidas: .asciiz "Tres casillas repetidas consecutivas. Has perdido.\n"
+	strJuegoTerminado: .asciiz "Juego terminado.\n"
+	strTesorosEncontrados: .asciiz "Tesoros encontrados: "
+	strDineroAcumulado: .asciiz "Dinero acumulado: $"
+	strChacalesEncontradosFinal: .asciiz "Chacales encontrados: "
 
 .text
 .globl inicializarTablero
