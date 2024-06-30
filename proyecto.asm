@@ -33,46 +33,43 @@ newline: .asciiz "\n"
 .globl main
 
 main:
-    # Inicializar el juego
     li $v0, 4
     la $a0, mensajeInicioJuego
     syscall
 
     jal inicioTablero
     
-    # Bucle principal del juego
 comienzoJuego:
     jal generacionNumeroAleatorio
     
     move $t4, $v0
 
-    # Mostrar el número generado
     li $v0, 4
     la $a0, strCasilla
     syscall
 
-    move $a0, $t4  # Mover el número generado a $a0
-    li $v0, 1      # Syscall para imprimir entero
+    move $a0, $t4  
+    li $v0, 1      
     syscall
 
     li $v0, 4
     la $a0, newline
     syscall
     
-    move $v0, $t4  # Mover el número generado a $v0
+    move $v0, $t4  
 
     jal casillaDescubierta
 
-    # Mostrar el tablero actualizado
+    
     jal presentarTablero
     
-    # Mostrar el dinero acumulado
+    
     jal presentarDinero
     
-    # Verificar condiciones de fin del juego
+    
     jal verificarCondiciones
     
-    # Preguntar al jugador si quiere continuar
+    
     jal continuarJuego
     beq $v0, 0, finalizarJuego
 
@@ -83,13 +80,13 @@ finalizarJuego:
     li $v0, 10
     syscall
 
-# Inicializa el tablero con chacales y tesoros distribuidos aleatoriamente
-inicioTablero:
-    li $t0, 0  # Índice del tablero
-    li $t1, 4  # Número de chacales
-    li $t2, 8  # Número de tesoros
 
-# Inicializar tablero con 0 (vacío)
+inicioTablero:
+    li $t0, 0 
+    li $t1, 4
+    li $t2, 8
+
+
 inicializarLoop:
     li $t3, 0
     sb $t3, tablero($t0)
@@ -97,37 +94,35 @@ inicializarLoop:
     addi $t0, $t0, 1
     bne $t0, 12, inicializarLoop
 
-# Colocar chacales en el tablero
+
 colocarChacales:
-    li $v0, 42         # syscall code para generar un entero aleatorio
-    li $a1, 12         # limite superior exclusivo del entero a generarse 
+    li $v0, 42         
+    li $a1, 12         
     syscall
 
-    move $t4, $a0 # the random number 0-11
+    move $t4, $a0 
 
-    # Verificar si la casilla ya está ocupada
+    
     lb $t5, tablero($t4)
     bnez $t5, colocarChacales
 
-    # Colocar chacal
+    
     li $t5, 1
     sb $t5, tablero($t4)
     subi $t1, $t1, 1
     bnez $t1, colocarChacales
 
-# Colocar tesoros en el tablero
+
 colocarTesoros:
-    li $v0, 42         # syscall code para generar un entero aleatorio
-    li $a1, 12         # limite superior exclusivo del entero a generarse 
+    li $v0, 42         
+    li $a1, 12         
     syscall
 
-    move $t4, $a0 # the random number 0-11
+    move $t4, $a0 
 
-    # Verificar si la casilla ya está ocupada
     lb $t5, tablero($t4)
     bnez $t5, colocarTesoros
 
-    # Colocar tesoro
     li $t5, 2
     sb $t5, tablero($t4)
     subi $t2, $t2, 1
@@ -135,7 +130,7 @@ colocarTesoros:
 
     jr $ra
 
-# Mostrar el dinero acumulado
+
 presentarDinero:
     li $v0, 4
     la $a0, strDinero
@@ -143,7 +138,7 @@ presentarDinero:
     
     la $t0, dineroGanado
     lw $a0, 0($t0)
-    li $v0, 1      # Syscall para imprimir entero
+    li $v0, 1      
     syscall
 
     li $v0, 4
@@ -152,19 +147,19 @@ presentarDinero:
     
     jr $ra
 
-# Muestra el estado actual del tablero
+
 presentarTablero:
     li $v0, 4
     la $a0, strTablero
     syscall
 
-    li $t0, 0  # Inicializa el índice del bucle
+    li $t0, 0 
 
 presentarTableroLoop:
-    lb $t2, descubiertas($t0)  # Cargar el estado de descubrimiento de la casilla actual
-    beqz $t2, casillaOculta  # Si la casilla no está descubierta, mostrar "?"
+    lb $t2, descubiertas($t0)  
+    beqz $t2, casillaOculta  
 
-    lb $t1, tablero($t0)  # Cargar el contenido de la casilla actual
+    lb $t1, tablero($t0)  
     beq $t1, 0, casillaVacia
     beq $t1, 1, casillaChacal
     beq $t1, 2, casillaTesoro
@@ -197,16 +192,16 @@ siguienteCasilla:
     bne $t0, 12, presentarTableroLoop
     jr $ra
 
-# Genera un número aleatorio entre 1 y 12
+
 generacionNumeroAleatorio:
     addi $sp, $sp, -8
     sw $ra, 8($sp)
     sw $a0, 4($sp)
     sw $a1, 0($sp)
     
-    li $v0, 42         # syscall code para generar un entero aleatorio
-    li $a1, 12         # limite superior exclusivo del entero a generarse 
-    syscall            # genera el entero y lo guarda en a0
+    li $v0, 42       
+    li $a1, 12
+    syscall
     
     addi $v0, $a0, 1
     
@@ -217,15 +212,15 @@ generacionNumeroAleatorio:
     
     jr $ra
 
-# Descubre la casilla seleccionada
+
 casillaDescubierta:
-    move $t0, $v0       # $t0 = número de casilla
-    subi $t0, $t0, 1    # Convertir de 1-12 a 0-11
+    move $t0, $v0       
+    subi $t0, $t0, 1    
     lb $t1, descubiertas($t0)
-    bnez $t1, casillaActualDescubierta  # Si la casilla ya está descubierta, ir a la etiqueta correspondiente
+    bnez $t1, casillaActualDescubierta  
 
     li $t1, 1
-    sb $t1, descubiertas($t0)  # Marcar la casilla como descubierta
+    sb $t1, descubiertas($t0)  
 
     lb $t1, tablero($t0)
     beqz $t1, descubrirCasillaVacia
@@ -269,21 +264,21 @@ casillaActualDescubierta:
 finalizarDescubrir:
     jr $ra
 
-# Verifica las condiciones de ganar o perder
+
 verificarCondiciones:
     lw $t0, chacalesEncontrados
     lw $t1, tesorosEncontrados
     lw $t2, intentosFallidos
 
-    # Si se han encontrado 4 chacales, el juego termina en perder
+
     li $t3, 4
     beq $t0, $t3, perder
 
-    # Si se han encontrado los 4 tesoros necesarios para ganar, el juego termina en ganar
+
     li $t3, 8
     beq $t1, $t3, ganar
 
-    # Si hay más de 5 intentos fallidos, el juego termina en perder
+
     li $t3, 5
     bgt $t2, $t3, perder
 
@@ -305,7 +300,7 @@ ganar:
     li $v0, 10
     syscall
 
-# Pregunta al usuario si desea continuar jugando
+
 continuarJuego:
     li $v0, 4
     la $a0, strContinuar
@@ -315,7 +310,7 @@ continuarJuego:
     syscall
     move $t0, $v0
 
-    # Validar la opción ingresada
+
     li $t1, 1
     beq $t0, $t1, opcionValida
 
@@ -332,7 +327,7 @@ opcionValida:
     move $v0, $t0
     jr $ra
 
-# Muestra los resultados finales del juego
+
 mostrarResultados:
     li $v0, 4
     la $a0, strDinero
